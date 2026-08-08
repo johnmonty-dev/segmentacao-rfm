@@ -80,7 +80,3 @@ Baixa o dataset em [kaggle.com/datasets/olistbr/brazilian-ecommerce](https://www
 - Separar a análise de quem comprou uma vez só de quem é recorrente, misturar os dois distorce a Frequência.
 - Puxar dados de categoria de produto e avaliação para enriquecer os perfis.
 - Automatizar a atualização do modelo periodicamente.
-
----
-
-*Projeto desenvolvido com apoio de IA para estruturação do passo a passo e revisão de código, todo o código foi executado, testado e depurado por mim, célula por célula.*
