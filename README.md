@@ -6,7 +6,7 @@ Projeto de segmentação de clientes usando a metodologia **RFM (Recência, Freq
 
 ## Por que esse dataset
 
-Usei o [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) (Kaggle) em vez de um CSV único já pronto, de propósito: dados reais quase nunca vêm numa tabela só. Precisei unir três tabelas (`orders`, `order_items`, `customers`) pelo `order_id` e `customer_id` — o que já é, na prática, boa parte do trabalho real de quem mexe com dados no dia a dia.
+Usei o [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) (Kaggle) em vez de um CSV único já pronto, de propósito: dados reais quase nunca vêm numa tabela só. Precisei unir três tabelas (`orders`, `order_items`, `customers`) pelo `order_id` e `customer_id`, o que já é, na prática, boa parte do trabalho real de quem mexe com dados no dia a dia.
 
 Um detalhe que só descobri rodando o código: o Olist tem duas colunas de cliente diferentes, `customer_id` e `customer_unique_id`. A primeira muda a cada pedido do mesmo cliente (!), e usar ela por engano faria todo mundo parecer que comprou uma única vez. Tive que usar `customer_unique_id` para identificar a pessoa de verdade.
 
@@ -29,7 +29,7 @@ Um detalhe que só descobri rodando o código: o Olist tem duas colunas de clien
 
 ## O que me chamou atenção (e por que os nomes dos clusters estão "errados" de propósito)
 
-Reparei numa coisa estranha olhando a tabela acima: o cluster "VIP / Campeões" tem recência média de 220 dias — **pior** que o "Fiéis / Regulares", que tem só 43 dias. Isso não fazia sentido para um "VIP".
+Reparei numa coisa estranha olhando a tabela acima: o cluster "VIP / Campeões" tem recência média de 220 dias, **pior** que o "Fiéis / Regulares", que tem só 43 dias. Isso não fazia sentido para um "VIP".
 
 Fui investigar e a explicação é simples: como mais de 90% dos clientes da base compraram uma única vez, a Frequência quase não ajuda a separar os grupos, na prática, o K-Means acabou agrupando os clientes principalmente pelo **valor gasto**, não pela proximidade da última compra. Ou seja, "VIP" aqui significa "gastou bastante numa única compra", não "cliente fiel e recente" como o nome sugere.
 
@@ -40,7 +40,7 @@ Isso muda a leitura de negócio:
 - **VIP / Campeões** — alto valor histórico, mas também já bem inativos.
 - **Risco de Churn / Inativos** — o grupo de menor valor e maior inatividade.
 
-Deixei os nomes originais na tabela de propósito para mostrar esse processo — acho mais honesto do que já entregar os nomes "corrigidos" sem explicar como cheguei lá.
+Deixei os nomes originais na tabela de propósito para mostrar esse processo, acho mais honesto do que já entregar os nomes "corrigidos" sem explicar como cheguei lá.
 
 ## O que eu faria de campanha para cada grupo
 
@@ -77,7 +77,7 @@ Baixa o dataset em [kaggle.com/datasets/olistbr/brazilian-ecommerce](https://www
 
 ## O que ainda quero mexer
 
-- Separar a análise de quem comprou uma vez só de quem é recorrente — misturar os dois distorce a Frequência.
+- Separar a análise de quem comprou uma vez só de quem é recorrente, misturar os dois distorce a Frequência.
 - Puxar dados de categoria de produto e avaliação para enriquecer os perfis.
 - Automatizar a atualização do modelo periodicamente.
 
