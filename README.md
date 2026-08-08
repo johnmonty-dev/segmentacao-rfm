@@ -2,23 +2,23 @@
 
 **Stack:** Python • Pandas • scikit-learn • Matplotlib • Seaborn
 
-Modelo de segmentação de clientes utilizando a metodologia **RFM (Recência, Frequência e Valor Monetário)** combinada com **K-Means clustering**, aplicado à base pública de e-commerce da Olist (marketplace brasileiro). O projeto identifica perfis de clientes com base em comportamento de compra real e gera insights acionáveis para campanhas de marketing.
+Projeto de segmentação de clientes usando a metodologia **RFM (Recência, Frequência e Valor Monetário)** combinada com **K-Means**, aplicado aos dados reais e públicos da Olist, um marketplace brasileiro. A ideia foi sair do dataset genérico de tutorial e trabalhar com uma base real, com toda a bagunça que isso traz (tabelas separadas, dados sujos, comportamento de compra que não segue o "livro-texto").
 
-## Base de dados
+## Por que esse dataset
 
-[Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) — dataset público disponível no Kaggle, com pedidos reais e anonimizados de um marketplace brasileiro entre 2016 e 2018.
+Usei o [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) (Kaggle) em vez de um CSV único já pronto, de propósito: dados reais quase nunca vêm numa tabela só. Precisei unir três tabelas (`orders`, `order_items`, `customers`) pelo `order_id` e `customer_id` — o que já é, na prática, boa parte do trabalho real de quem mexe com dados no dia a dia.
 
-Tabelas utilizadas: `olist_orders_dataset.csv`, `olist_order_items_dataset.csv` e `olist_customers_dataset.csv`, unidas por `order_id` e `customer_id`. A identificação do cliente usa `customer_unique_id`, já que `customer_id` é gerado por pedido (não por pessoa) nesse dataset.
+Um detalhe que só descobri rodando o código: o Olist tem duas colunas de cliente diferentes, `customer_id` e `customer_unique_id`. A primeira muda a cada pedido do mesmo cliente (!), e usar ela por engano faria todo mundo parecer que comprou uma única vez. Tive que usar `customer_unique_id` para identificar a pessoa de verdade.
 
-## Metodologia
+## O que eu fiz
 
-1. **Limpeza:** remoção de pedidos não entregues (`order_status != 'delivered'`), preços inválidos e datas nulas.
-2. **Cálculo RFM:** Recência (dias desde a última compra), Frequência (nº de pedidos únicos) e Valor Monetário (soma gasta) por cliente.
-3. **RFM Score:** pontuação por quartis (1–4) para cada dimensão, com regra manual adaptada para Frequência (a maioria dos clientes tem apenas 1 compra, o que inviabiliza divisão em quartis).
-4. **Clustering:** aplicação de log(1+x) e padronização (`StandardScaler`) nas três variáveis, seguido de **K-Means** (k=4, escolhido via método do cotovelo e coeficiente de silhueta).
-5. **Nomeação dos segmentos:** clusters traduzidos em rótulos de negócio com base no perfil médio de cada grupo.
+1. **Limpeza:** tirei pedidos cancelados/não entregues, preços zerados ou negativos, datas vazias.
+2. **Cálculo do RFM:** para cada cliente, calculei há quantos dias ele não compra (Recência), quantos pedidos diferentes fez (Frequência) e quanto gastou no total (Monetário).
+3. **RFM Score clássico:** dividi cada métrica em quartis (nota 1 a 4). Precisei adaptar a nota de Frequência na mão, porque quase todo mundo comprou só uma vez — dividir isso em quartis "iguais" simplesmente não funciona.
+4. **K-Means:** apliquei log + padronização nas três variáveis e rodei o clustering. Usei o método do cotovelo e o coeficiente de silhueta para escolher k=4.
+5. **Nomeei os clusters** olhando o perfil médio de cada grupo (recência, frequência e valor médios).
 
-## Resultados
+## Resultado
 
 | Segmento | Clientes | % da base | Receita | % da receita | Recência média |
 |---|---|---|---|---|---|
@@ -27,41 +27,45 @@ Tabelas utilizadas: `olist_orders_dataset.csv`, `olist_order_items_dataset.csv` 
 | Fiéis / Regulares | 16.538 | 17,7% | R$ 1.875.551,71 | 14,2% | **43 dias** |
 | VIP / Campeões | 2.801 | 3,0% | R$ 728.408,75 | 5,5% | 220 dias |
 
-## Observação crítica sobre os clusters
+## O que me chamou atenção (e por que os nomes dos clusters estão "errados" de propósito)
 
-Um achado importante desta análise: como **mais de 90% dos clientes da Olist compraram apenas uma vez**, a dimensão Frequência tem baixo poder de separação entre grupos. Como consequência, o K-Means acabou segmentando os clientes majoritariamente pelo **Valor Monetário**, não pela recência de relacionamento — por isso o segmento "VIP / Campeões" apresenta recência média (220 dias) pior que o "Fiéis / Regulares" (43 dias).
+Reparei numa coisa estranha olhando a tabela acima: o cluster "VIP / Campeões" tem recência média de 220 dias — **pior** que o "Fiéis / Regulares", que tem só 43 dias. Isso não fazia sentido para um "VIP".
 
-Isso expõe uma limitação real do modelo nesse contexto de negócio: em um marketplace onde a recompra é rara, "quem gasta mais numa única compra" não é o mesmo que "quem tem relacionamento contínuo com a marca". Uma leitura mais precisa dos segmentos seria:
+Fui investigar e a explicação é simples: como mais de 90% dos clientes da base compraram uma única vez, a Frequência quase não ajuda a separar os grupos — na prática, o K-Means acabou agrupando os clientes principalmente pelo **valor gasto**, não pela proximidade da última compra. Ou seja, "VIP" aqui significa "gastou bastante numa única compra", não "cliente fiel e recente" como o nome sugere.
 
-- **Fiéis / Regulares** → clientes com atividade recente (43 dias) — o grupo mais próximo de um relacionamento contínuo real.
-- **Novos / Em desenvolvimento** → na prática, clientes de **compra única de alto valor**, concentrando 67% da receita mas inativos há quase 9 meses — carecem de uma campanha de reativação, não de "boas-vindas".
-- **VIP / Campeões** → clientes de alto valor histórico, também já inativos há bastante tempo.
-- **Risco de Churn / Inativos** → menor valor histórico e maior tempo de inatividade — grupo de menor prioridade de investimento.
+Isso muda a leitura de negócio:
 
-## Recomendações de marketing
+- **Fiéis / Regulares** — na real, é o único grupo com atividade recente de verdade (43 dias). É o mais próximo de um "cliente fiel" de verdade.
+- **Novos / Em desenvolvimento** — nome enganoso: são clientes de **compra única de alto valor**, que concentram 67% de toda a receita mas estão sumidos há quase 9 meses. Não são "novos", são clientes valiosos que sumiram.
+- **VIP / Campeões** — alto valor histórico, mas também já bem inativos.
+- **Risco de Churn / Inativos** — o grupo de menor valor e maior inatividade.
 
-| Segmento | Ação recomendada |
+Deixei os nomes originais na tabela de propósito para mostrar esse processo — acho mais honesto do que já entregar os nomes "corrigidos" sem explicar como cheguei lá.
+
+## O que eu faria de campanha para cada grupo
+
+| Segmento | Ação |
 |---|---|
-| Novos / Em desenvolvimento (compra única de alto valor) | Prioridade máxima: campanha de win-back — concentram 67% da receita e estão inativos há ~9 meses |
-| VIP / Campeões | Programa de fidelidade e oferta exclusiva de retorno, dado o alto ticket histórico |
-| Fiéis / Regulares | Cross-sell/up-sell — único grupo com atividade recente, potencial de aumento de ticket médio |
-| Risco de Churn / Inativos | Reativação de baixo custo (cupom simples) — menor prioridade orçamentária dado o menor valor histórico |
+| Novos / Em desenvolvimento (compra única de alto valor) | Prioridade #1: campanha de reativação — é quem mais gerou receita e está mais sumido |
+| VIP / Campeões | Programa de fidelidade / oferta exclusiva de retorno |
+| Fiéis / Regulares | Cross-sell / up-sell, já que é o único grupo ativo |
+| Risco de Churn / Inativos | Reativação mais barata (cupom simples), prioridade menor dado o valor histórico baixo |
 
-## Estrutura do repositório
+## Estrutura
 
 ```
 segmentacao-rfm/
 ├── data/
-│   ├── olist_*.csv                       (dados brutos do Kaggle — não versionados)
+│   ├── olist_*.csv                       (dados brutos — baixar do Kaggle, ver abaixo)
 │   ├── clientes_segmentados_rfm.csv      (resultado: cliente + segmento)
-│   └── resumo_clusters.csv               (perfil médio de cada cluster)
+│   └── resumo_clusters.csv
 ├── notebooks/
 │   └── segmentacao_rfm_olist.ipynb
 ├── requirements.txt
 └── README.md
 ```
 
-## Como reproduzir
+## Como rodar
 
 ```bash
 python -m venv venv
@@ -69,10 +73,14 @@ source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Baixe o dataset em [kaggle.com/datasets/olistbr/brazilian-ecommerce](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce), extraia os CSVs em `data/` e execute `notebooks/segmentacao_rfm_olist.ipynb`.
+Baixa o dataset em [kaggle.com/datasets/olistbr/brazilian-ecommerce](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce), joga os CSVs em `data/` e roda o notebook.
 
-## Próximos passos
+## O que ainda quero mexer
 
-- Incorporar dados de categoria de produto e avaliação (`olist_order_reviews_dataset.csv`) para enriquecer os perfis.
-- Testar segmentação separada para clientes de compra única vs. recorrente, já que misturá-los distorce a leitura de Frequência.
-- Automatizar a atualização periódica do modelo em pipeline de dados.
+- Separar a análise de quem comprou uma vez só de quem é recorrente — misturar os dois distorce a Frequência.
+- Puxar dados de categoria de produto e avaliação para enriquecer os perfis.
+- Automatizar a atualização do modelo periodicamente.
+
+---
+
+*Projeto desenvolvido com apoio de IA para estruturação do passo a passo e revisão de código — todo o código foi executado, testado e depurado por mim, célula por célula.*
