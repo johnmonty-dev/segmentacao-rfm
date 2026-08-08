@@ -14,7 +14,7 @@ Um detalhe que só descobri rodando o código: o Olist tem duas colunas de clien
 
 1. **Limpeza:** tirei pedidos cancelados/não entregues, preços zerados ou negativos, datas vazias.
 2. **Cálculo do RFM:** para cada cliente, calculei há quantos dias ele não compra (Recência), quantos pedidos diferentes fez (Frequência) e quanto gastou no total (Monetário).
-3. **RFM Score clássico:** dividi cada métrica em quartis (nota 1 a 4). Precisei adaptar a nota de Frequência na mão, porque quase todo mundo comprou só uma vez — dividir isso em quartis "iguais" simplesmente não funciona.
+3. **RFM Score clássico:** dividi cada métrica em quartis (nota 1 a 4). Precisei adaptar a nota de Frequência na mão, porque quase todo mundo comprou só uma vez, dividir isso em quartis "iguais" simplesmente não funciona.
 4. **K-Means:** apliquei log + padronização nas três variáveis e rodei o clustering. Usei o método do cotovelo e o coeficiente de silhueta para escolher k=4.
 5. **Nomeei os clusters** olhando o perfil médio de cada grupo (recência, frequência e valor médios).
 
@@ -31,7 +31,7 @@ Um detalhe que só descobri rodando o código: o Olist tem duas colunas de clien
 
 Reparei numa coisa estranha olhando a tabela acima: o cluster "VIP / Campeões" tem recência média de 220 dias — **pior** que o "Fiéis / Regulares", que tem só 43 dias. Isso não fazia sentido para um "VIP".
 
-Fui investigar e a explicação é simples: como mais de 90% dos clientes da base compraram uma única vez, a Frequência quase não ajuda a separar os grupos — na prática, o K-Means acabou agrupando os clientes principalmente pelo **valor gasto**, não pela proximidade da última compra. Ou seja, "VIP" aqui significa "gastou bastante numa única compra", não "cliente fiel e recente" como o nome sugere.
+Fui investigar e a explicação é simples: como mais de 90% dos clientes da base compraram uma única vez, a Frequência quase não ajuda a separar os grupos, na prática, o K-Means acabou agrupando os clientes principalmente pelo **valor gasto**, não pela proximidade da última compra. Ou seja, "VIP" aqui significa "gastou bastante numa única compra", não "cliente fiel e recente" como o nome sugere.
 
 Isso muda a leitura de negócio:
 
@@ -83,4 +83,4 @@ Baixa o dataset em [kaggle.com/datasets/olistbr/brazilian-ecommerce](https://www
 
 ---
 
-*Projeto desenvolvido com apoio de IA para estruturação do passo a passo e revisão de código — todo o código foi executado, testado e depurado por mim, célula por célula.*
+*Projeto desenvolvido com apoio de IA para estruturação do passo a passo e revisão de código, todo o código foi executado, testado e depurado por mim, célula por célula.*
