@@ -1,4 +1,4 @@
-# Segmentação de Clientes (RFM) — Olist E-Commerce
+# Segmentação de Clientes (RFM): Olist E-Commerce
 
 **Stack:** Python • Pandas • scikit-learn • Matplotlib • Seaborn
 
@@ -27,11 +27,11 @@ Um detalhe que só descobri rodando o código: o Olist tem duas colunas de clien
 | Fiéis / Regulares | 16.538 | 17,7% | R$ 1.875.551,71 | 14,2% | **43 dias** |
 | VIP / Campeões | 2.801 | 3,0% | R$ 728.408,75 | 5,5% | 220 dias |
 
-## O que me chamou atenção (e por que os nomes dos clusters estão "errados" de propósito)
+## Problemas no desenvolvimento do projeto
 
-Reparei numa coisa estranha olhando a tabela acima: o cluster "VIP / Campeões" tem recência média de 220 dias, **pior** que o "Fiéis / Regulares", que tem só 43 dias. Isso não fazia sentido para um "VIP".
+Durante o desenvolvimento do projeto, o cluster "VIP / Campeões" tem recência média de 220 dias, **pior** que o "Fiéis / Regulares", que tem só 43 dias. Isso não fazia sentido para um cliente "VIP".
 
-Fui investigar e a explicação é simples: como mais de 90% dos clientes da base compraram uma única vez, a Frequência quase não ajuda a separar os grupos, na prática, o K-Means acabou agrupando os clientes principalmente pelo **valor gasto**, não pela proximidade da última compra. Ou seja, "VIP" aqui significa "gastou bastante numa única compra", não "cliente fiel e recente" como o nome sugere.
+A explicação é simples: como mais de 90% dos clientes da base compraram uma única vez, a Frequência quase não ajuda a separar os grupos, na prática, o K-Means acabou agrupando os clientes principalmente pelo **valor gasto**, não pela proximidade da última compra. Ou seja, "VIP" aqui significa "gastou bastante numa única compra", não "cliente fiel e recente" como o nome sugere.
 
 Isso muda a leitura de negócio:
 
@@ -40,7 +40,7 @@ Isso muda a leitura de negócio:
 - **VIP / Campeões** — alto valor histórico, mas também já bem inativos.
 - **Risco de Churn / Inativos** — o grupo de menor valor e maior inatividade.
 
-Deixei os nomes originais na tabela de propósito para mostrar esse processo, acho mais honesto do que já entregar os nomes "corrigidos" sem explicar como cheguei lá.
+Deixei os nomes originais na tabela de propósito para mostrar esse processo, acho mais pr´stico do que já entregar os nomes "corrigidos" sem explicar como cheguei lá.
 
 ## O que eu faria de campanha para cada grupo
 
@@ -74,9 +74,3 @@ pip install -r requirements.txt
 ```
 
 Baixa o dataset em [kaggle.com/datasets/olistbr/brazilian-ecommerce](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce), joga os CSVs em `data/` e roda o notebook.
-
-## O que ainda quero mexer
-
-- Separar a análise de quem comprou uma vez só de quem é recorrente, misturar os dois distorce a Frequência.
-- Puxar dados de categoria de produto e avaliação para enriquecer os perfis.
-- Automatizar a atualização do modelo periodicamente.
