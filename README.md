@@ -6,7 +6,7 @@ Projeto de segmentação de clientes usando a metodologia **RFM (Recência, Freq
 
 ## Por que esse dataset
 
-Usei o [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) (Kaggle) em vez de um CSV único já pronto, de propósito: dados reais quase nunca vêm numa tabela só. Precisei unir três tabelas (`orders`, `order_items`, `customers`) pelo `order_id` e `customer_id`, o que já é, na prática, boa parte do trabalho real de quem mexe com dados no dia a dia.
+Usei o [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) (Kaggle) em vez de um CSV único já pronto, de propósito: dados reais quase nunca vêm numa tabela só. Precisei unir três tabelas (`orders`, `order_items`, `customers`) pelo `order_id` e `customer_id`, o que já é boa parte do trabalho real de quem mexe com dados no dia a dia.
 
 Um detalhe que só descobri rodando o código: o Olist tem duas colunas de cliente diferentes, `customer_id` e `customer_unique_id`. A primeira muda a cada pedido do mesmo cliente (!), e usar ela por engano faria todo mundo parecer que comprou uma única vez. Tive que usar `customer_unique_id` para identificar a pessoa de verdade.
 
