@@ -282,8 +282,6 @@ Algumas possibilidades de evolução do projeto seriam:
 
 O projeto demonstra a aplicação de uma metodologia de segmentação sobre uma base real de comércio eletrônico, combinando preparação de dados, análise exploratória, construção de métricas RFM e aprendizado não supervisionado com K-Means.
 
-Mais do que apenas gerar clusters, a análise também avalia se os grupos encontrados pelo algoritmo possuem uma interpretação coerente com os dados.
-
 O principal resultado foi identificar que a baixa recorrência de compras da base limita a utilização da Frequência como variável de segmentação, fazendo com que o valor gasto tenha maior influência na formação dos grupos.
 
 Essa análise reforça a importância de validar e interpretar os resultados de modelos de segmentação antes de utilizá-los para conclusões de negócio.
